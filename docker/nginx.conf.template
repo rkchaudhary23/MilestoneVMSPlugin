@@ -1,0 +1,66 @@
+# Serves the plugin under /vms/milestone/ on the port IDCUBE assigns ($PORT, spec §10.3–10.5).
+# TLS, HSTS and the Access360 Content-Security-Policy are set centrally at the Ingress and
+# shared router in front of the Pod; only headers that cannot conflict with them are set here.
+server {
+    listen       ${PORT};
+    server_name  _;
+    server_tokens off;
+    root         /usr/share/nginx/html;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    # Live and Archive are framed by Access360 on the same origin only (spec §7.4).
+    add_header Content-Security-Policy "frame-ancestors 'self'" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+
+    location = / {
+        return 302 /vms/milestone/;
+    }
+
+    location = /vms/milestone {
+        return 301 /vms/milestone/;
+    }
+
+    # Hashed build output: cache for a year.
+    location ~ ^/vms/milestone/[^/]+-[0-9A-Z]{8}\.(js|css)$ {
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        add_header X-Content-Type-Options "nosniff" always;
+        try_files $uri =404;
+    }
+
+    # Runtime config and the Milestone SDK are not hashed: always revalidate.
+    location /vms/milestone/assets/ {
+        add_header Cache-Control "no-cache";
+        add_header X-Content-Type-Options "nosniff" always;
+        try_files $uri =404;
+    }
+
+    # SPA fallback so /configuration, /live/:cameraId and /archive/:cameraId survive a refresh.
+    location /vms/milestone/ {
+        add_header Cache-Control "no-store";
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Content-Security-Policy "frame-ancestors 'self'" always;
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        try_files $uri /vms/milestone/index.html;
+    }
+
+    location /healthz {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    # The Milestone SDK connects from the browser straight to the tenant's XProtect Mobile
+    # Server. If IDCUBE decides to route that traffic through this container instead, add a
+    # proxied location here with WebSocket upgrade and buffering off, for example:
+    #
+    # location /vms/milestone/xpms/ {
+    #     proxy_pass https://<mobile-server>:8082/;
+    #     proxy_http_version 1.1;
+    #     proxy_set_header Upgrade $http_upgrade;
+    #     proxy_set_header Connection "upgrade";
+    #     proxy_buffering off;
+    #     proxy_read_timeout 3600s;
+    # }
+}

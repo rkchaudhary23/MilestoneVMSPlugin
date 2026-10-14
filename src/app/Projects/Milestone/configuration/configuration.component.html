@@ -1,0 +1,90 @@
+<main class="page">
+  <h1>Milestone XProtect</h1>
+
+  @if (notice(); as n) {
+    <p class="notice notice-{{ n.kind }}" [attr.role]="n.kind === 'error' || n.kind === 'warning' ? 'alert' : 'status'">
+      {{ n.text }}
+    </p>
+  }
+
+  @if (ready()) {
+    <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <h2>Server connection</h2>
+
+      <label for="serverUrl">XProtect Mobile Server URL</label>
+      <input id="serverUrl" type="url" formControlName="serverUrl" placeholder="https://milestone.example.com:8082" autocomplete="url" />
+      @if (hasError('serverUrl')) {
+        <small class="field-error">
+          @if (form.controls.serverUrl.hasError('insecure')) {
+            Use an https:// address. Access360 is served over https, so browsers block http video connections.
+          } @else {
+            Enter the full server address, for example https://milestone.example.com:8082.
+          }
+        </small>
+      }
+
+      <label for="loginType">Login type</label>
+      <select id="loginType" formControlName="loginType">
+        <option value="Basic">Basic user</option>
+        <option value="Windows">Windows user</option>
+      </select>
+
+      <label for="userName">User name</label>
+      <input id="userName" type="text" formControlName="userName" autocomplete="username" />
+      @if (hasError('userName')) {
+        <small class="field-error">Enter the Milestone user name.</small>
+      }
+
+      <label for="password">Password</label>
+      <input id="password" type="password" formControlName="password" autocomplete="current-password" />
+      @if (hasError('password')) {
+        <small class="field-error">Enter the password.</small>
+      }
+
+      <div class="actions">
+        <button type="button" class="btn" (click)="testConnection()" [disabled]="busy()">Test connection</button>
+        <button type="submit" class="btn btn-primary" [disabled]="busy()">Save</button>
+      </div>
+    </form>
+
+    <section>
+      <h2>Cameras</h2>
+      <div class="actions">
+        <button type="button" class="btn" (click)="fetchCameras()" [disabled]="busy()">Fetch cameras from Milestone</button>
+        <button type="button" class="btn btn-primary" (click)="sync()" [disabled]="busy() || pendingChanges() === 0">
+          Sync {{ pendingChanges() }} change(s) to Access360
+        </button>
+      </div>
+
+      @if (rows().length) {
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Camera</th>
+              <th scope="col">Milestone camera ID</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.cameraId) {
+              <tr>
+                <td>{{ row.name }}</td>
+                <td>{{ row.cameraId }}</td>
+                <td>
+                  @switch (row.status) {
+                    @case ('new') { Will be added }
+                    @case ('renamed') { Will be renamed }
+                    @case ('removed') { Will be removed }
+                    @default { Synced }
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <p>No cameras yet. Save the server details, then fetch cameras.</p>
+      }
+    </section>
+  }
+</main>

@@ -1,0 +1,33 @@
+.page {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+form {
+  display: grid;
+  gap: 0.25rem;
+  max-width: 32rem;
+}
+
+label {
+  margin-top: 0.5rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+}

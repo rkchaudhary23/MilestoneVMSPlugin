@@ -1,0 +1,28 @@
+<section class="player" #player>
+  <canvas #canvas class="video" aria-label="Live video"></canvas>
+
+  @if (state() === 'loading' || state() === 'error') {
+    <div class="overlay" [attr.role]="state() === 'error' ? 'alert' : 'status'">
+      <p>{{ message() }}</p>
+      @if (state() === 'error') {
+        <button type="button" class="btn" (click)="play()">Retry</button>
+      }
+    </div>
+  }
+
+  @if (state() === 'paused') {
+    <div class="overlay" role="status">
+      <button type="button" class="btn" (click)="play()">Play live video</button>
+    </div>
+  }
+
+  <div class="controls">
+    @if (state() === 'playing') {
+      <button type="button" class="btn" (click)="pause()">Pause</button>
+    } @else if (state() === 'paused') {
+      <button type="button" class="btn" (click)="play()">Play</button>
+    }
+    <span class="spacer"></span>
+    <button type="button" class="btn" (click)="toggleFullscreen()">Full screen</button>
+  </div>
+</section>

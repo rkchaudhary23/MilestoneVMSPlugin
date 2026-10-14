@@ -1,0 +1,45 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.player {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.video {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0 0 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.timeline {
+  flex: 1;
+  min-width: 8rem;
+}
+
+.time {
+  white-space: nowrap;
+}

@@ -1,0 +1,11 @@
+/*
+ * Intentionally no colours, fonts or resets here (spec §7.1–7.2). Inside IDCUBE's VMS
+ * workspace the plugin inherits Access360's global stylesheet and theme; in this standalone
+ * project, link the Access360 stylesheet from the test environment to preview the real look.
+ */
+html,
+body,
+app-root {
+  height: 100%;
+  margin: 0;
+}
