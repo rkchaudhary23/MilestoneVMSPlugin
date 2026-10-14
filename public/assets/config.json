@@ -1,0 +1,10 @@
+{
+  "backendBaseUrl": "",
+  "tokenEndpoint": "GetToken",
+  "tokenCacheMinutes": 10,
+  "access360Origin": "",
+  "handshakeTimeoutMs": 1500,
+  "decodeDataQueryParam": "data",
+  "sdkScriptPath": "assets/xpmobilesdk/XPMobileSDK.js",
+  "firstFrameTimeoutMs": 10000
+}

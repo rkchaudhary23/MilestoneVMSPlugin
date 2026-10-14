@@ -1,0 +1,53 @@
+<section class="player" #player>
+  <canvas #canvas class="video" aria-label="Recorded video"></canvas>
+
+  @if (state() === 'loading' || state() === 'error') {
+    <div class="overlay" [attr.role]="state() === 'error' ? 'alert' : 'status'">
+      <p>{{ message() }}</p>
+    </div>
+  }
+
+  @if (state() === 'out-of-range') {
+    <div class="overlay" role="alert">
+      <p>{{ message() }}</p>
+      <p>Requested: {{ requested() | date: 'medium' }}</p>
+      @if (recordingStart(); as start) {
+        <p>Recordings are available from {{ start | date: 'medium' }} until now.</p>
+        <button type="button" class="btn" (click)="goToEarliest()">Go to the earliest recording</button>
+      } @else {
+        <p>The camera's recorded range could not be read from the Milestone server.</p>
+      }
+    </div>
+  }
+
+  <div class="controls">
+    <button type="button" class="btn" (click)="step(-30)" [disabled]="state() === 'loading'" aria-label="Back 30 seconds">-30s</button>
+    <button type="button" class="btn" (click)="reverse()" [disabled]="state() !== 'playing' && state() !== 'paused'">Reverse</button>
+    @if (state() === 'playing' && speed() > 0) {
+      <button type="button" class="btn" (click)="pause()">Pause</button>
+    } @else {
+      <button type="button" class="btn" (click)="play()" [disabled]="state() !== 'playing' && state() !== 'paused'">Play</button>
+    }
+    <button type="button" class="btn" (click)="step(30)" [disabled]="state() === 'loading'" aria-label="Forward 30 seconds">+30s</button>
+
+    <input
+      class="timeline"
+      type="range"
+      aria-label="Timeline"
+      [min]="timelineMin"
+      [max]="timelineMax"
+      step="1000"
+      [value]="(current() ?? requested()).getTime()"
+      (change)="seek($any($event.target).value)"
+    />
+    <span class="time">{{ (current() ?? requested()) | date: 'medium' }}</span>
+
+    <input
+      type="datetime-local"
+      aria-label="Go to date and time"
+      [value]="requestedInput"
+      (change)="jumpTo($any($event.target).value)"
+    />
+    <button type="button" class="btn" (click)="toggleFullscreen()">Full screen</button>
+  </div>
+</section>
